@@ -10,7 +10,7 @@ This file provides guidelines for the AI assistant to generate relevant and cons
 
 ## 1. Project Overview
 
-- **Description:** A full-stack web application template for easily creating authentication-protected web applications with Next.js and MongoDB.
+- **Description:** A full-stack web application template for easily creating authentication-protected web applications with Next.js and PostgreSQL.
 - **Framework:** Next.js (using Turbopack for development).
 
 ## 2. Technical Stack
@@ -20,7 +20,7 @@ This file provides guidelines for the AI assistant to generate relevant and cons
 - **Styling:** Tailwind CSS (v4) with `prettier-plugin-tailwindcss`. `clsx` and `tailwind-merge` are used for class name management.
 - **UI Components:** Uses `shadcn/ui` components (located in `src/components/ui/`), which are built on top of Radix UI primitives (`@radix-ui/*`).
 - **Backend/API:** Handled by Next.js API routes.
-- **Database ORM:** Prisma (`@prisma/client`), using MongoDB as the database.
+- **Database ORM:** Prisma (`@prisma/client`), using PostgreSQL as the database.
 - **Authentication:** NextAuth.js (`next-auth`) with Prisma Adapter (`@auth/prisma-adapter`). Uses `bcryptjs` for password hashing.
 - **Forms:** React Hook Form (`react-hook-form`) with Zod (`zod`) for validation (`@hookform/resolvers`).
 - **State Management:** Potentially using React Context or Zustand/Jotai (not explicitly defined yet, but common with Next.js). `next-themes` is used for theme management.

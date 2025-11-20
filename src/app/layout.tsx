@@ -12,16 +12,16 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: `${APP_NAME} | Next.js Auth Mongo Template`,
-  description: `${APP_NAME} is a Next.js Authentication MongoDB Template`,
-  keywords: ['Next.js', 'Authentication', 'MongoDB', 'Template'],
+  title: `${APP_NAME} | Next.js Auth Postgres Template`,
+  description: `${APP_NAME} is a Next.js Authentication Postgres Template`,
+  keywords: ['Next.js', 'Authentication', 'Postgres', 'Template'],
   icons: {
     icon: '/favicon.ico',
     apple: '/favicon.ico',
   },
   openGraph: {
-    title: `${APP_NAME} | Next.js Auth Mongo Template`,
-    description: `${APP_NAME} is a Next.js Authentication MongoDB Template`,
+    title: `${APP_NAME} | Next.js Auth Postgres Template`,
+    description: `${APP_NAME} is a Next.js Authentication Postgres Template`,
     type: 'website',
     locale: 'en_US',
   },
