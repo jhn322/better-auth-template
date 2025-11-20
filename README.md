@@ -1,6 +1,6 @@
-# Next.js Auth MongoDB Template
+# Next.js Auth PostgreSQL Template
 
-A full-stack authentication template built with Next.js, MongoDB, and NextAuth.js. This template provides a complete authentication system with email/password authentication, OAuth providers (Google and GitHub), email verification, and password reset functionality.
+A full-stack authentication template built with Next.js, PostgreSQL (Neon), and NextAuth.js. This template provides a complete authentication system with email/password authentication, OAuth providers (Google and GitHub), email verification, and password reset functionality.
 
 ## Features
 
@@ -13,7 +13,7 @@ A full-stack authentication template built with Next.js, MongoDB, and NextAuth.j
   - Password reset via email
   - Transactional emails via Brevo
 - 🗄️ **Database**
-  - MongoDB with Prisma ORM
+  - PostgreSQL with Prisma ORM
   - User management with roles (USER, ADMIN)
   - Session and account management
 - 🎨 **Modern UI**
@@ -33,7 +33,7 @@ Before you begin, ensure you have the following installed:
 
 - [Node.js](https://nodejs.org/) (v18 or higher)
 - [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/) or [pnpm](https://pnpm.io/)
-- A MongoDB database (local or cloud)
+- A PostgreSQL database (Neon recommended)
 - A Google Cloud Console account (for Google OAuth)
 - A GitHub account (for GitHub OAuth)
 - A Brevo account (for email sending)
@@ -44,7 +44,7 @@ Before you begin, ensure you have the following installed:
 
 ```bash
 git clone <repository-url>
-cd nextjs-auth-mongo-template
+cd nextjs-auth-postgres-template
 ```
 
 ### 2. Install Dependencies
@@ -53,14 +53,20 @@ cd nextjs-auth-mongo-template
 npm install
 # or
 yarn install
-   - For development/testing, you can temporarily allow access from anywhere by adding `0.0.0.0/0` (⚠️ **Not recommended for production**)
-   - Click **"Confirm"**
+```
 
-#### Option B: Local MongoDB
+### 3. Set Up Database
 
-1. Install MongoDB locally following the [official installation guide](https://www.mongodb.com/docs/manual/installation/)
-2. Start your MongoDB service
-3. Your connection string will be: `mongodb://localhost:27017/<database-name>`
+#### Option A: Neon (Recommended)
+
+1. Go to [Neon](https://vercel.com/marketplace/neon) and create a project
+2. Get your connection string from the Neon dashboard
+
+#### Option B: Local PostgreSQL
+
+1. Install PostgreSQL locally following the [official installation guide](https://www.postgresql.org/download/)
+2. Start your PostgreSQL service
+3. Your connection string will be: `postgresql://user:password@localhost:5432/<database-name>`
 
 ### 4. Set Up Environment Variables
 
@@ -68,7 +74,7 @@ Create a `.env.local` file in the root directory of the project:
 
 ```bash
 # Database
-DATABASE_URL="your-mongodb-connection-string"
+DATABASE_URL="your-postgres-connection-string"
 
 # NextAuth Configuration
 NEXTAUTH_URL="https://your-production-domain.com"
@@ -199,7 +205,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 
 | Variable               | Description                                            | Example                                              |
 | ---------------------- | ------------------------------------------------------ | ---------------------------------------------------- |
-| `DATABASE_URL`         | MongoDB connection string                              | `mongodb+srv://user:pass@cluster.mongodb.net/dbname` |
+| `DATABASE_URL`         | PostgreSQL connection string                           | `postgresql://<username>:<password>@<host>:<port>/<database>` |
 | `NEXTAUTH_URL`         | Base URL of your application (production)              | `https://yourdomain.com`                             |
 | `NEXTAUTH_SECRET`      | Secret key for NextAuth (generate securely)            | `base64-encoded-random-string`                       |
 | `NEXT_PUBLIC_APP_URL`  | Public URL of your application                         | `https://yourdomain.com`                             |
@@ -211,12 +217,36 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 | `EMAIL_FROM_NAME`      | Name displayed in email sender                         | `My App`                                             |
 | `EMAIL_FROM_ADDRESS`   | Email address to send from (must be verified in Brevo) | `noreply@yourdomain.com`                             |
 
+![important]
+
+> **Important:** All of the following environment variables will be **automatically added** to your Vercel project after a **successful Neon → Vercel integration**.  
+> You do **not** need to manually create or configure them.
+
+**Environment Variables Automatically Added:**
+
+- `DATABASE_POSTGRES_URL`
+- `DATABASE_POSTGRES_PRISMA_URL`
+- `DATABASE_URL_UNPOOLED`
+- `DATABASE_POSTGRES_URL_NON_POOLING`
+- `DATABASE_PGHOST`
+- `DATABASE_POSTGRES_USER`
+- `DATABASE_URL`
+- `DATABASE_POSTGRES_PASSWORD`
+- `DATABASE_POSTGRES_DATABASE`
+- `DATABASE_PGPASSWORD`
+- `DATABASE_PGDATABASE`
+- `DATABASE_PGHOST_UNPOOLED`
+- `DATABASE_PGUSER`
+- `DATABASE_POSTGRES_URL_NO_SSL`
+- `DATABASE_POSTGRES_HOST`
+- `DATABASE_NEON_PROJECT_ID`
+
 ### Development vs Production
 
 #### Development (`.env.local`)
 
 ```bash
-DATABASE_URL="mongodb+srv://user:pass@cluster.mongodb.net/dbname"
+DATABASE_URL="postgresql://user:pass@ep-random-123456.us-east-2.aws.neon.tech/neondb"
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="your-generated-secret"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
@@ -234,16 +264,16 @@ EMAIL_FROM_ADDRESS="noreply@yourdomain.com"
 When deploying to production (Vercel, Netlify, etc.), set these environment variables in your platform's dashboard:
 
 - Use your production domain for `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL`
-- Ensure MongoDB network access allows your production server's IP
+- Ensure PostgreSQL network access allows your production server's IP
 - Update OAuth redirect URIs to use your production domain
 - Use a strong, randomly generated `NEXTAUTH_SECRET`
 
 ## Project Structure
 
 ```
-nextjs-auth-mongo-template/
+nextjs-auth-postgres-template/
 ├── prisma/
-│   └── schema.prisma          # Prisma schema for MongoDB
+│   └── schema.prisma          # Prisma schema for PostgreSQL
 ├── src/
 │   ├── app/                   # Next.js App Router pages
 │   │   ├── api/               # API routes
@@ -283,7 +313,7 @@ nextjs-auth-mongo-template/
 
 ## Security Considerations
 
-- ⚠️ **MongoDB Network Access**: For production, restrict MongoDB access to specific IP addresses rather than `0.0.0.0/0`
+- ⚠️ **PostgreSQL Network Access**: For production, restrict PostgreSQL access to specific IP addresses if possible
 - 🔐 **NEXTAUTH_SECRET**: Always use a strong, randomly generated secret
 - 🔒 **Environment Variables**: Never commit `.env.local` to version control
 - ✅ **Email Verification**: Email verification is required before users can log in with email/password
@@ -291,11 +321,11 @@ nextjs-auth-mongo-template/
 
 ## Troubleshooting
 
-### MongoDB Connection Issues
+### PostgreSQL Connection Issues
 
 - Verify your `DATABASE_URL` is correct
-- Check that your IP address is whitelisted in MongoDB Atlas
-- Ensure your MongoDB user has the correct permissions
+- Check that your IP address is allowed in Neon/PostgreSQL settings
+- Ensure your PostgreSQL user has the correct permissions
 
 ### OAuth Not Working
 
@@ -315,8 +345,9 @@ nextjs-auth-mongo-template/
 
 1. Push your code to GitHub
 2. Import your repository in [Vercel](https://vercel.com)
-3. Add all environment variables in the Vercel dashboard
-4. Deploy
+3. Add "npx prisma generate && next build" under Build and Development
+4. Add all environment variables in the Vercel dashboard
+5. Deploy
 
 ### Other Platforms
 
@@ -330,16 +361,8 @@ The application can be deployed to any platform that supports Next.js:
 Make sure to:
 
 - Set all required environment variables
-- Configure MongoDB network access for your server's IP
+- Configure PostgreSQL network access for your server's IP
 - Update OAuth redirect URIs to your production domain
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
