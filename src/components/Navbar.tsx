@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { authClient } from '@/lib/auth/auth-client';
 import { OnlineStatusIndicator } from '@/components/ui/online-status-indicator';
@@ -45,20 +45,13 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   // Get current session from BetterAuth
   const { data: session, isPending } = authClient.useSession();
-
-  // Checking for OAuth callback params
-  const isProcessingOAuth =
-    searchParams?.has('code') && !searchParams?.has('error');
-
-  const status =
-    isPending || isProcessingOAuth
-      ? 'loading'
-      : session
-        ? 'authenticated'
-        : 'unauthenticated';
+  const status = isPending
+    ? 'loading'
+    : session
+      ? 'authenticated'
+      : 'unauthenticated';
 
   // Check if user is authenticated
   const isAuthenticated = !!session;
