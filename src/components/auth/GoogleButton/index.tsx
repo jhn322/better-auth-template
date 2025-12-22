@@ -8,13 +8,14 @@ export const GoogleButton = ({
   mode,
   onSuccess,
   isLoading = false,
+  disabled = false,
 }: GoogleButtonProps) => {
   return (
     <Button
       variant="outline"
       className="w-full rounded-full"
       onClick={onSuccess} // The onClick handler now directly uses the provided onSuccess callback
-      disabled={isLoading}
+      disabled={isLoading || disabled}
     >
       {isLoading ? (
         <>

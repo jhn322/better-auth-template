@@ -9,13 +9,14 @@ export const GithubButton = ({
   mode,
   onSuccess,
   isLoading = false,
+  disabled = false,
 }: GithubButtonProps) => {
   return (
     <Button
       variant="outline"
       className="w-full rounded-full"
       onClick={onSuccess}
-      disabled={isLoading}
+      disabled={isLoading || disabled}
     >
       {isLoading ? (
         <>

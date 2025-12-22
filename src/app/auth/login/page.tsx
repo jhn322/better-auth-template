@@ -56,7 +56,7 @@ function LoginContent() {
     }
   }, [authenticated, authLoading, router]);
 
-  const isLoading =
+  const isAnyLoading =
     formLoading || googleLoading || githubLoading || authLoading;
 
   if (authLoading || (!authLoading && authenticated)) {
@@ -109,12 +109,14 @@ function LoginContent() {
               <GoogleButton
                 mode="login"
                 onSuccess={handleGoogleSignIn}
-                isLoading={isLoading}
+                isLoading={googleLoading}
+                disabled={isAnyLoading}
               />
               <GithubButton
                 mode="login"
                 onSuccess={handleGithubSignIn}
-                isLoading={isLoading}
+                isLoading={githubLoading}
+                disabled={isAnyLoading}
               />
             </div>
             <AuthDivider text="Or sign in with email" />

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { authClient } from '@/lib/auth/auth-client';
-import { DEFAULT_LOGIN_REDIRECT_PATH } from '@/lib/constants/routes';
+import { DEFAULT_LOGIN_REDIRECT } from '@/lib/auth/constants/auth';
 
 interface UseGithubAuthProps {
   onSuccess?: () => void;
@@ -18,7 +18,7 @@ export const useGithubAuth = ({
     try {
       await authClient.signIn.social({
         provider: 'github',
-        callbackURL: DEFAULT_LOGIN_REDIRECT_PATH,
+        callbackURL: DEFAULT_LOGIN_REDIRECT,
       });
       onSuccess?.();
     } catch (error) {
