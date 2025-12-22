@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { authClient } from '@/lib/auth/auth-client';
+import { DEFAULT_LOGIN_REDIRECT_PATH } from '@/lib/constants/routes';
 
 interface UseGoogleAuthProps {
   onSuccess?: () => void;
@@ -17,7 +18,7 @@ export const useGoogleAuth = ({
     try {
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: window.location.origin + '/',
+        callbackURL: DEFAULT_LOGIN_REDIRECT_PATH,
       });
       onSuccess?.();
     } catch (error) {
