@@ -1,7 +1,7 @@
 // import { Resend } from "resend";
-import { getEnvVar } from "@/lib/utils/env";
-import { API_AUTH_PATHS } from "@/lib/constants/routes";
-import { APP_NAME } from "@/lib/constants/site";
+import { getEnvVar } from '@/lib/utils/env';
+// import { API_AUTH_PATHS } from '@/lib/constants/routes';
+import { APP_NAME } from '@/lib/constants/site';
 
 /**
  * Sends a password reset email to the specified user using Brevo.
@@ -9,15 +9,15 @@ import { APP_NAME } from "@/lib/constants/site";
  * @param token - The password reset token (unhashed).
  * @throws Will throw an error if configuration is missing or the API call fails.
  */
-export const sendPasswordResetEmail = async (email: string, token: string) => {
+export const sendPasswordResetEmail = async (email: string, url: string) => {
   // * 1. Get Configuration from Environment Variables
-  const brevoApiKey = getEnvVar("BREVO_API_KEY");
-  const senderEmail = getEnvVar("EMAIL_FROM_ADDRESS");
-  const senderName = getEnvVar("EMAIL_FROM_NAME") || APP_NAME;
-  const baseUrl = getEnvVar("NEXT_PUBLIC_APP_URL");
+  const brevoApiKey = getEnvVar('BREVO_API_KEY');
+  const senderEmail = getEnvVar('EMAIL_FROM_ADDRESS');
+  const senderName = getEnvVar('EMAIL_FROM_NAME') || APP_NAME;
+  const baseUrl = getEnvVar('NEXT_PUBLIC_APP_URL');
 
   // * 2. Construct Reset URL and Payload
-  const resetLink = `${baseUrl}/auth/reset-password?token=${token}`;
+  const resetLink = url;
   const privacyPolicyUrl = `${baseUrl}/privacypolicy`;
   const termsOfServiceUrl = `${baseUrl}/termsofservice`;
 
@@ -69,12 +69,12 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
 
   // * 3. Send Email via Brevo HTTP API
   try {
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
       headers: {
-        accept: "application/json",
-        "api-key": brevoApiKey,
-        "content-type": "application/json",
+        accept: 'application/json',
+        'api-key': brevoApiKey,
+        'content-type': 'application/json',
       },
       body: JSON.stringify(payload),
     });
@@ -89,7 +89,7 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
         errorBody = { rawMessage: errorBodyText };
       }
       console.error(
-        "Brevo HTTP API Error (Password Reset):",
+        'Brevo HTTP API Error (Password Reset):',
         response.status,
         response.statusText,
         errorBody
@@ -119,15 +119,15 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
  * @param token - The email verification token (unhashed).
  * @throws Will throw an error if configuration is missing or the API call fails.
  */
-export const sendVerificationEmail = async (email: string, token: string) => {
+export const sendVerificationEmail = async (email: string, url: string) => {
   // * 1. Get Configuration from Environment Variables
-  const brevoApiKey = getEnvVar("BREVO_API_KEY");
-  const senderEmail = getEnvVar("EMAIL_FROM_ADDRESS");
-  const senderName = getEnvVar("EMAIL_FROM_NAME") || APP_NAME;
-  const baseUrl = getEnvVar("NEXT_PUBLIC_APP_URL");
+  const brevoApiKey = getEnvVar('BREVO_API_KEY');
+  const senderEmail = getEnvVar('EMAIL_FROM_ADDRESS');
+  const senderName = getEnvVar('EMAIL_FROM_NAME') || APP_NAME;
+  const baseUrl = getEnvVar('NEXT_PUBLIC_APP_URL');
 
   // * 2. Construct Verification URL and Payload
-  const verificationUrl = `${baseUrl}${API_AUTH_PATHS.VERIFY_EMAIL}?token=${token}`;
+  const verificationUrl = url;
   const privacyPolicyUrl = `${baseUrl}/privacypolicy`;
   const termsOfServiceUrl = `${baseUrl}/termsofservice`;
 
@@ -179,12 +179,12 @@ export const sendVerificationEmail = async (email: string, token: string) => {
 
   // * 3. Send Email via Brevo HTTP API
   try {
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
       headers: {
-        accept: "application/json",
-        "api-key": brevoApiKey,
-        "content-type": "application/json",
+        accept: 'application/json',
+        'api-key': brevoApiKey,
+        'content-type': 'application/json',
       },
       body: JSON.stringify(payload),
     });
@@ -199,7 +199,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
         errorBody = { rawMessage: errorBodyText }; // Fallback to raw text
       }
       console.error(
-        "Brevo HTTP API Error:",
+        'Brevo HTTP API Error:',
         response.status,
         response.statusText,
         errorBody

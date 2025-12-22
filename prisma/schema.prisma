@@ -23,81 +23,58 @@ model User {
   id            String     @id @default(cuid())
   name          String?
   email         String     @unique
-  password      String?    // Make password optional for OAuth users
-  image         String?    // Profile image URL
-  emailVerified DateTime?  // Required for NextAuth
+  emailVerified Boolean    @default(false)
+  image         String?
   role          UserRole   @default(USER)
-  accounts      Account[]  // Required for NextAuth
-  sessions      Session[]  // Required for NextAuth
-  passwordResetTokens PasswordResetToken[] // Relation to PasswordResetToken model
-  emailVerificationTokens EmailVerificationToken[] // Relation to EmailVerificationToken model
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
+  
+  accounts      Account[]
+  sessions      Session[]
 }
 
-// ** NextAuth required models ** //
+// ** BetterAuth required models (mapped from BetterAuth) ** //
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
+  id                    String    @id @default(cuid())
+  userId                String
+  accountId             String    @map("providerAccountId")
+  providerId            String    @map("provider")
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  accessTokenExpiresAt  DateTime? @map("expires_at")
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?   @map("id_token")
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
+  @@unique([providerId, accountId])
 }
 
-// ** Session model ** //
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  expiresAt DateTime @map("expires")
+  token     String   @unique @map("sessionToken")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// ** VerificationToken model ** //
-model VerificationToken {
+model Verification {
   id         String   @id @default(cuid())
   identifier String
-  token      String   @unique
-  expires    DateTime
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  @@unique([identifier, token])
-}
-
-// ** EmailVerificationToken model ** //
-model EmailVerificationToken {
-  id        String   @id @default(cuid())
-  userId    String
-  token     String   @unique // Store a hash of the actual token
-  expires   DateTime
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-// ** PasswordResetToken model ** //
-model PasswordResetToken {
-  id        String   @id @default(cuid())
-  userId    String
-  token     String   @unique // Store a hash of the actual token
-  expires   DateTime
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
+  @@unique([identifier, value])
 }
 
 // ** UserRole enum ** //

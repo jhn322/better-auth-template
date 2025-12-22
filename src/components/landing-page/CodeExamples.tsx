@@ -89,34 +89,33 @@ function Button({ variant, size, asChild, ...props }) {
     size: 'normal',
   },
   {
-    title: 'Session Management',
+    title: 'Server-Side Protection',
     description:
-      'Session refresh and sign-in handler with provider support and error handling',
-    code: `const refreshSession = async (): Promise<Session | null> => {
-  try {
-    const updatedSession = await update();
-    return updatedSession;
-  } catch (error) {
-    console.error("[AuthContext] Error refreshing session:", error);
-    return null;
-  }
-};
+      'Middleware route protection with Better Auth session validation and automatic redirects',
+    code: `export async function middleware(request: NextRequest) {
+  const { nextUrl } = request;
+  const sessionToken = request.cookies.get('better-auth.session_token');
+  const isAuthenticated = !!sessionToken;
 
-const handleSignIn = async (
-  provider?: string,
-  options?: SignInOptions
-): Promise<SignInResponse | undefined> => {
-  try {
-    if (!provider && (!options || options.callbackUrl)) {
-      console.warn("[AuthContext] signIn called without a provider.");
-    }
-    const signInOptions = { redirect: true, ...options };
-    return await nextAuthSignIn(provider, signInOptions);
-  } catch (error) {
-    console.error("[AuthContext] Sign in error:", error);
-    return undefined;
+  const isProtectedRoute = 
+    nextUrl.pathname.startsWith('/dashboard') || 
+    nextUrl.pathname.startsWith('/settings');
+
+  if (isProtectedRoute && !isAuthenticated) {
+    const loginUrl = new URL('/auth/login', nextUrl.origin);
+    loginUrl.searchParams.set('callbackUrl', nextUrl.pathname);
+    return NextResponse.redirect(loginUrl);
   }
-};`,
+
+  if (isAuthenticated && (
+    nextUrl.pathname === '/auth/login' || 
+    nextUrl.pathname === '/auth/register'
+  )) {
+    return NextResponse.redirect(new URL('/dashboard', nextUrl.origin));
+  }
+
+  return NextResponse.next();
+}`,
     size: 'wide',
   },
   {

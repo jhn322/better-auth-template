@@ -30,7 +30,7 @@ export const PROTECTED_PATHS = {
 } as const;
 
 // ** API Authentication Paths ** //
-// These might be implicitly handled by NextAuth.js, but good to have if directly used
+// These might be implicitly handled by BetterAuth.js, but good to have if directly used
 export const API_AUTH_PATHS = {
   REGISTER: '/api/auth/register',
   VERIFY_EMAIL: '/api/auth/verify-email',
@@ -63,7 +63,7 @@ export const PUBLIC_ROUTE_PATTERNS: string[] = [
 
 // ** API Route Prefixes ** //
 export const API_ROUTE_PREFIX = '/api';
-export const API_AUTH_ROUTE_PREFIX = '/api/auth'; // Default NextAuth prefix
+export const API_AUTH_ROUTE_PREFIX = '/api/auth'; // Default BetterAuth prefix
 
 // ** Special Route Identifiers (if needed by middleware or logic) ** //
 export const ROOT_PATH = '/';

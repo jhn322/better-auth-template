@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/options';
-import prisma from '@/lib/prisma';
+import { auth } from '@/lib/auth/auth';
+import { headers } from 'next/headers';
 import { z } from 'zod';
-import bcrypt from 'bcryptjs';
 
 const passwordSchema = z.object({
   currentPassword: z.string().min(1, 'Current password is required'),
@@ -12,9 +10,11 @@ const passwordSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
-    if (!session?.user?.email) {
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -30,32 +30,20 @@ export async function POST(req: Request) {
 
     const { currentPassword, newPassword } = result.data;
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user || !user.password) {
-      return NextResponse.json(
-        { error: 'User not found or no password set' },
-        { status: 404 }
-      );
+    try {
+      await auth.api.changePassword({
+        headers: await headers(),
+        body: {
+          currentPassword,
+          newPassword,
+          revokeOtherSessions: true,
+        },
+      });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to update password';
+      return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
-
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
-
-    if (!isPasswordValid) {
-      return NextResponse.json(
-        { error: 'Incorrect current password' },
-        { status: 400 }
-      );
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
-
-    await prisma.user.update({
-      where: { email: session.user.email },
-      data: { password: hashedPassword },
-    });
 
     return NextResponse.json({ message: 'Password updated successfully' });
   } catch (error) {

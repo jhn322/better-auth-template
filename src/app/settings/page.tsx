@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -22,6 +21,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { authClient } from '@/lib/auth/auth-client';
 
 // Schema for Profile Form
 const profileSchema = z.object({
@@ -47,7 +47,7 @@ type PasswordFormValues = z.infer<typeof passwordSchema>;
 type Tab = 'profile' | 'account' | 'members' | 'billing' | 'invoices' | 'api';
 
 export default function SettingsPage() {
-  const { data: session, update } = useSession();
+  const { data: session } = authClient.useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [hasPassword, setHasPassword] = useState(false);
   const [userImage, setUserImage] = useState<string | null>(null);
@@ -92,21 +92,19 @@ export default function SettingsPage() {
   async function onProfileSubmit(data: ProfileFormValues) {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/user/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+      const { error: updateError } = await authClient.updateUser({
+        name: data.name,
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to update profile');
+      if (updateError) {
+        throw new Error(updateError.message || 'Failed to update profile');
       }
 
-      await update({ name: data.name });
       toast.success('Profile updated successfully');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Something went wrong');
+      toast.error(
+        error instanceof Error ? error.message : 'Something went wrong'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -115,24 +113,22 @@ export default function SettingsPage() {
   async function onPasswordSubmit(data: PasswordFormValues) {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/user/password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          currentPassword: data.currentPassword,
-          newPassword: data.newPassword,
-        }),
+      const { error: changeError } = await authClient.changePassword({
+        newPassword: data.newPassword,
+        currentPassword: data.currentPassword,
+        revokeOtherSessions: true,
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to update password');
+      if (changeError) {
+        throw new Error(changeError.message || 'Failed to update password');
       }
 
       toast.success('Password updated successfully');
       passwordForm.reset();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Something went wrong');
+      toast.error(
+        error instanceof Error ? error.message : 'Something went wrong'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -157,7 +153,6 @@ export default function SettingsPage() {
 
       const data = await response.json();
       setUserImage(data.imageUrl);
-      await update({ image: data.imageUrl });
       toast.success('Profile image updated');
     } catch {
       toast.error('Failed to upload image');
@@ -188,15 +183,15 @@ export default function SettingsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="bg-background text-foreground min-h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between px-8 py-6 border-b">
+      <div className="flex items-center justify-between border-b px-8 py-6">
         <h1 className="text-2xl font-bold">Settings</h1>
         <div className="relative w-64">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
           <Input
             placeholder="Search settings..."
-            className="pl-8 bg-muted/50 border-none"
+            className="bg-muted/50 border-none pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -205,7 +200,7 @@ export default function SettingsPage() {
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-64 border-r min-h-[calc(100vh-81px)] p-6 space-y-1">
+        <aside className="min-h-[calc(100vh-81px)] w-64 space-y-1 border-r p-6">
           {renderSidebarButton('profile', 'Profile')}
           {renderSidebarButton('account', 'Account')}
           {renderSidebarButton('members', 'Members')}
@@ -215,7 +210,7 @@ export default function SettingsPage() {
         </aside>
 
         {/* Content */}
-        <main className="flex-1 p-8 max-w-4xl">
+        <main className="max-w-4xl flex-1 p-8">
           {activeTab === 'profile' ? (
             <>
               {/* Basic Information */}
@@ -224,12 +219,12 @@ export default function SettingsPage() {
                 'View and update your personal details and account information.'
               ) && (
                 <section className="mb-12">
-                  <div className="flex justify-between items-start mb-6">
+                  <div className="mb-6 flex items-start justify-between">
                     <div>
-                      <h2 className="text-lg font-semibold mb-1">
+                      <h2 className="mb-1 text-lg font-semibold">
                         Basic information
                       </h2>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-muted-foreground text-sm">
                         View and update your personal details and account
                         information.
                       </p>
@@ -238,14 +233,16 @@ export default function SettingsPage() {
                     {/* Profile Image */}
                     <div className="flex flex-col items-center gap-2">
                       <Avatar
-                        className="h-20 w-20 cursor-pointer hover:opacity-80 transition-opacity"
+                        className="h-20 w-20 cursor-pointer transition-opacity hover:opacity-80"
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <AvatarImage
                           src={userImage || session?.user?.image || ''}
                         />
                         <AvatarFallback className="text-lg">
-                          {session?.user?.name?.charAt(0).toUpperCase() || 'U'}
+                          {(session?.user?.name || session?.user?.email)
+                            ?.charAt(0)
+                            .toUpperCase() || 'U'}
                         </AvatarFallback>
                       </Avatar>
                       <Button
@@ -265,7 +262,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
-                  <div className="grid gap-6 max-w-2xl">
+                  <div className="grid max-w-2xl gap-6">
                     <Form {...profileForm}>
                       <form
                         onSubmit={profileForm.handleSubmit(onProfileSubmit)}
@@ -308,10 +305,9 @@ export default function SettingsPage() {
                 </section>
               )}
 
-              {(shouldShowSection(
-                'Basic information',
-                ''
-              ) || shouldShowSection('Change password', '')) && hasPassword && <Separator className="my-8" />}
+              {(shouldShowSection('Basic information', '') ||
+                shouldShowSection('Change password', '')) &&
+                hasPassword && <Separator className="my-8" />}
 
               {/* Change Password - Only for non-OAuth users */}
               {hasPassword &&
@@ -321,15 +317,15 @@ export default function SettingsPage() {
                 ) && (
                   <section className="mb-12">
                     <div className="mb-6">
-                      <h2 className="text-lg font-semibold mb-1">
+                      <h2 className="mb-1 text-lg font-semibold">
                         Change password
                       </h2>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-muted-foreground text-sm">
                         Update your password to keep your account secure.
                       </p>
                     </div>
 
-                    <div className="grid gap-6 max-w-2xl">
+                    <div className="grid max-w-2xl gap-6">
                       <Form {...passwordForm}>
                         <form
                           onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
@@ -388,18 +384,17 @@ export default function SettingsPage() {
                     </div>
                   </section>
                 )}
-
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-              <div className="p-4 rounded-full bg-muted">
-                <Search className="h-8 w-8 text-muted-foreground" />
+            <div className="flex h-full flex-col items-center justify-center space-y-4 text-center">
+              <div className="bg-muted rounded-full p-4">
+                <Search className="text-muted-foreground h-8 w-8" />
               </div>
               <div>
                 <h2 className="text-xl font-semibold">
                   {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
                 </h2>
-                <p className="text-muted-foreground max-w-sm mt-2">
+                <p className="text-muted-foreground mt-2 max-w-sm">
                   This section is currently under development. Check back later
                   for updates.
                 </p>

@@ -1,14 +1,11 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { GoogleIcon } from './GoogleIcon';
 import type { GoogleButtonProps } from './types';
-import {
-  AUTH_MESSAGES,
-  DEFAULT_LOGIN_REDIRECT,
-} from '@/lib/auth/constants/auth';
 import { Loader2 } from 'lucide-react';
+import { authClient } from '@/lib/auth/auth-client';
+import { DEFAULT_LOGIN_REDIRECT_PATH } from '@/lib/constants/routes';
 
 export const GoogleButton = ({
   mode,
@@ -18,23 +15,15 @@ export const GoogleButton = ({
 }: GoogleButtonProps) => {
   const handleGoogleSignIn = async () => {
     try {
-      const result = await signIn('google', {
-        callbackUrl: DEFAULT_LOGIN_REDIRECT,
-        redirect: false,
+      await authClient.signIn.social({
+        provider: 'google',
+        callbackURL: DEFAULT_LOGIN_REDIRECT_PATH,
       });
-
-      if (result?.error) {
-        onError?.(
-          new Error(result.error || AUTH_MESSAGES.ERROR_GOOGLE_SIGNIN_FAILED)
-        );
-      } else if (result?.ok && onSuccess) {
-        onSuccess();
-      }
+      // onSuccess might not be called due to redirect, but good to have if BetterAuth changes behavior
+      onSuccess?.();
     } catch (error) {
       onError?.(
-        error instanceof Error
-          ? error
-          : new Error(AUTH_MESSAGES.ERROR_GOOGLE_SIGNIN_FAILED)
+        error instanceof Error ? error : new Error('Google sign in failed')
       );
     }
   };

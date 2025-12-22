@@ -12,16 +12,15 @@ import type { AuthFormData } from '@/components/auth/AuthForm/types';
 import { useAuthForm } from '@/lib/auth/hooks/useAuthForm';
 import { useGoogleAuth } from '@/lib/auth/hooks/useGoogleAuth';
 import { useGithubAuth } from '@/lib/auth/hooks/useGithubAuth';
-import { useAuth } from '@/context/auth-context';
 import { Spinner } from '@/components/ui/spinner';
 import { DEFAULT_LOGIN_REDIRECT } from '@/lib/auth/constants/auth';
+import { authClient } from '@/lib/auth/auth-client';
 import { APP_NAME } from '@/lib/constants/site';
 
 function RegisterContent() {
   const router = useRouter();
-  const { status } = useAuth();
-  const authenticated = status === 'authenticated';
-  const authLoading = status === 'loading';
+  const { data: session, isPending: authLoading } = authClient.useSession();
+  const authenticated = !!session;
 
   const {
     loading: formLoading,
@@ -35,12 +34,12 @@ function RegisterContent() {
 
   const { loading: googleLoading, handleGoogleSignIn } = useGoogleAuth({
     onSuccess: () => router.push(DEFAULT_LOGIN_REDIRECT),
-    onError: (error) => setError(error.message),
+    onError: (err: Error) => setError(err.message),
   });
 
   const { loading: githubLoading, handleGithubSignIn } = useGithubAuth({
     onSuccess: () => router.push(DEFAULT_LOGIN_REDIRECT),
-    onError: (error) => setError(error.message),
+    onError: (err: Error) => setError(err.message),
   });
 
   useEffect(() => {

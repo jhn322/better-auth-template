@@ -1,14 +1,11 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { GithubIcon } from './GithubIcon';
 import type { GithubButtonProps } from './types';
-import {
-  AUTH_MESSAGES,
-  DEFAULT_LOGIN_REDIRECT,
-} from '@/lib/auth/constants/auth';
 import { Loader2 } from 'lucide-react';
+import { authClient } from '@/lib/auth/auth-client';
+import { DEFAULT_LOGIN_REDIRECT_PATH } from '@/lib/constants/routes';
 
 export const GithubButton = ({
   mode,
@@ -18,23 +15,15 @@ export const GithubButton = ({
 }: GithubButtonProps) => {
   const handleGithubSignIn = async () => {
     try {
-      const result = await signIn('github', {
-        callbackUrl: DEFAULT_LOGIN_REDIRECT,
-        redirect: false,
+      await authClient.signIn.social({
+        provider: 'github',
+        callbackURL: DEFAULT_LOGIN_REDIRECT_PATH,
       });
-
-      if (result?.error) {
-        onError?.(
-          new Error(result.error || AUTH_MESSAGES.ERROR_GITHUB_SIGNIN_FAILED)
-        );
-      } else if (result?.ok && onSuccess) {
-        onSuccess();
-      }
+      // onSuccess might not be called due to redirect, but good to have if BetterAuth changes behavior
+      onSuccess?.();
     } catch (error) {
       onError?.(
-        error instanceof Error
-          ? error
-          : new Error(AUTH_MESSAGES.ERROR_GITHUB_SIGNIN_FAILED)
+        error instanceof Error ? error : new Error('GitHub sign in failed')
       );
     }
   };

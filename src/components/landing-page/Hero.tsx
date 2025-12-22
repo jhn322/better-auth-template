@@ -4,9 +4,13 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { AUTH_PATHS } from '@/lib/constants/routes';
+import { AUTH_PATHS, PROTECTED_PATHS } from '@/lib/constants/routes';
+import { authClient } from '@/lib/auth/auth-client';
 
 export function Hero() {
+  const { data: session } = authClient.useSession();
+  const isAuthenticated = !!session;
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -59,25 +63,33 @@ export function Hero() {
           variants={itemVariants}
           className="flex flex-row flex-wrap justify-center gap-3 pt-4"
         >
-          <Link href={AUTH_PATHS.LOGIN}>
+          <Link
+            href={
+              isAuthenticated
+                ? PROTECTED_PATHS.DASHBOARD_BASE
+                : AUTH_PATHS.LOGIN
+            }
+          >
             <Button
               size="lg"
               className="bg-primary text-primary-foreground group relative overflow-hidden rounded-full px-6 py-3 text-sm shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl md:px-8 md:py-6 md:text-base"
             >
               <span className="relative flex items-center gap-2">
-                Get Started
+                {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
                 <ArrowRight className="h-4 w-4" />
               </span>
             </Button>
           </Link>
-          <Link href={AUTH_PATHS.REGISTER}>
-            <Button
-              size="lg"
-              className="border-primary/40 bg-primary/10 hover:bg-primary/20 text-foreground rounded-full border-2 px-6 py-3 text-sm shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-xl md:px-8 md:py-6 md:text-base"
-            >
-              Sign Up Free
-            </Button>
-          </Link>
+          {!isAuthenticated && (
+            <Link href={AUTH_PATHS.REGISTER}>
+              <Button
+                size="lg"
+                className="border-primary/40 bg-primary/10 hover:bg-primary/20 text-foreground rounded-full border-2 px-6 py-3 text-sm shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-xl md:px-8 md:py-6 md:text-base"
+              >
+                Sign Up Free
+              </Button>
+            </Link>
+          )}
         </motion.div>
 
         {/* Floating code snippet preview */}

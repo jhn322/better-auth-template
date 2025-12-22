@@ -3,16 +3,16 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSession } from 'next-auth/react';
 import { toast } from 'sonner';
 import { MailWarning, LogOut } from 'lucide-react';
 import { APP_NAME } from '@/lib/constants/site';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { signOut } from 'next-auth/react';
+import { authClient } from '@/lib/auth/auth-client';
+import { AUTH_PATHS } from '@/lib/constants/routes';
 
 function VerifyEmailContent() {
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = authClient.useSession();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleResendClick = async () => {
@@ -23,25 +23,18 @@ function VerifyEmailContent() {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/resend-verification', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: session.user.email }),
+      const { error: resendError } = await authClient.sendVerificationEmail({
+        email: session.user.email,
+        callbackURL: window.location.origin + '/auth/login',
       });
 
-      const responseData = await response.json();
-
-      if (!response.ok) {
+      if (resendError) {
         throw new Error(
-          responseData.message || 'Failed to resend verification email.'
+          resendError.message || 'Failed to resend verification email.'
         );
       }
 
-      toast.success(
-        responseData.message || 'Verification email sent successfully!'
-      );
+      toast.success('Verification email sent successfully!');
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'An unexpected error occurred.';
@@ -53,7 +46,7 @@ function VerifyEmailContent() {
   };
 
   // Handle loading state while session is checked
-  if (status === 'loading') {
+  if (isPending) {
     return (
       <div className="flex items-center justify-center py-4">
         <Spinner className="h-8 w-8" />
@@ -62,7 +55,7 @@ function VerifyEmailContent() {
   }
 
   // If somehow user lands here without being logged in (middleware should prevent this)
-  if (status === 'unauthenticated') {
+  if (!session) {
     return (
       <div className="space-y-4 text-center">
         <MailWarning
@@ -74,7 +67,7 @@ function VerifyEmailContent() {
           You need to be logged in to manage email verification.
         </p>
         <Button asChild variant="outline">
-          <Link href="/auth/login">Back to Login</Link>
+          <Link href={AUTH_PATHS.LOGIN}>Back to Login</Link>
         </Button>
       </div>
     );
@@ -101,7 +94,15 @@ function VerifyEmailContent() {
         </Button>
         <Button
           variant="outline"
-          onClick={() => signOut({ callbackUrl: '/auth/login' })}
+          onClick={() =>
+            authClient.signOut({
+              fetchOptions: {
+                onSuccess: () => {
+                  window.location.href = '/auth/login';
+                },
+              },
+            })
+          }
         >
           <LogOut className="mr-2 h-4 w-4" /> Log Out
         </Button>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { useSession, signOut } from 'next-auth/react';
+import { authClient } from '@/lib/auth/auth-client';
 import { OnlineStatusIndicator } from '@/components/ui/online-status-indicator';
 import {
   DropdownMenu,
@@ -44,13 +44,19 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathname = usePathname();
-  // Get current session from NextAuth
-  const { data: session, status } = useSession();
+  // Get current session from BetterAuth
+  const { data: session, isPending } = authClient.useSession();
+  const status = isPending
+    ? 'loading'
+    : session
+      ? 'authenticated'
+      : 'unauthenticated';
 
   // Check if user is authenticated
-  const isAuthenticated = status === 'authenticated';
+  const isAuthenticated = !!session;
   // Get user's role if authenticated
-  const userRole = session?.user?.role;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userRole = (session?.user as any)?.role;
 
   // Build up nav list with only public links
   const navItems = [...publicNavItems];
@@ -106,7 +112,7 @@ export function Navbar() {
             </div>
 
             {/* Desktop Navigation - Centered */}
-            <div className="hidden items-center gap-6 md:flex absolute left-1/2 -translate-x-1/2">
+            <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 md:flex">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -195,7 +201,15 @@ export function Navbar() {
 
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      onClick={() => signOut({ callbackUrl: '/' })}
+                      onClick={() => {
+                        authClient.signOut({
+                          fetchOptions: {
+                            onSuccess: () => {
+                              window.location.href = '/';
+                            },
+                          },
+                        });
+                      }}
                       className="cursor-pointer"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
@@ -285,7 +299,13 @@ export function Navbar() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => {
-                        signOut({ callbackUrl: '/' });
+                        authClient.signOut({
+                          fetchOptions: {
+                            onSuccess: () => {
+                              window.location.href = '/';
+                            },
+                          },
+                        });
                         setIsOpen(false);
                       }}
                       className="cursor-pointer"

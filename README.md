@@ -1,6 +1,6 @@
-# Next.js Auth PostgreSQL Template
+# Next.js BetterAuth Template
 
-A full-stack authentication template built with Next.js, PostgreSQL (Neon), and NextAuth.js. This template provides a complete authentication system with email/password authentication, OAuth providers (Google and GitHub), email verification, and password reset functionality.
+A full-stack authentication template built with Next.js, PostgreSQL (Neon), and BetterAuth.js in mind, but can easily be adapted to other authentication providers and databases. This template provides a complete authentication system with email/password authentication, OAuth providers (Google and GitHub), email verification, and password reset functionality.
 
 ## Features
 
@@ -76,9 +76,9 @@ Create a `.env.local` file in the root directory of the project:
 # Database
 DATABASE_URL="your-postgres-connection-string"
 
-# NextAuth Configuration
-NEXTAUTH_URL="https://your-production-domain.com"
-NEXTAUTH_SECRET="your-generated-secret-here"
+# BetterAuth Configuration
+BETTER_AUTH_URL="https://your-production-domain.com"
+BETTER_AUTH_SECRET="your-generated-secret-here"
 
 # Application URL
 NEXT_PUBLIC_APP_URL="https://your-production-domain.com"
@@ -97,7 +97,7 @@ EMAIL_FROM_NAME="Your App Name"
 EMAIL_FROM_ADDRESS="noreply@yourdomain.com"
 ```
 
-#### Generate NEXTAUTH_SECRET
+#### Generate BETTERAUTH_SECRET
 
 You can generate a secure secret using one of these methods:
 
@@ -203,19 +203,19 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 
 ### Required Variables
 
-| Variable               | Description                                            | Example                                              |
-| ---------------------- | ------------------------------------------------------ | ---------------------------------------------------- |
+| Variable               | Description                                            | Example                                                       |
+| ---------------------- | ------------------------------------------------------ | ------------------------------------------------------------- |
 | `DATABASE_URL`         | PostgreSQL connection string                           | `postgresql://<username>:<password>@<host>:<port>/<database>` |
-| `NEXTAUTH_URL`         | Base URL of your application (production)              | `https://yourdomain.com`                             |
-| `NEXTAUTH_SECRET`      | Secret key for NextAuth (generate securely)            | `base64-encoded-random-string`                       |
-| `NEXT_PUBLIC_APP_URL`  | Public URL of your application                         | `https://yourdomain.com`                             |
-| `GOOGLE_CLIENT_ID`     | Google OAuth Client ID                                 | `123456789-abc.apps.googleusercontent.com`           |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth Client Secret                             | `GOCSPX-xxxxxxxxxxxxx`                               |
-| `GITHUB_CLIENT_ID`     | GitHub OAuth Client ID                                 | `Iv1.xxxxxxxxxxxxx`                                  |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth Client Secret                             | `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`                   |
-| `BREVO_API_KEY`        | Brevo API key for sending emails                       | `xkeysib-xxxxxxxxxxxxx`                              |
-| `EMAIL_FROM_NAME`      | Name displayed in email sender                         | `My App`                                             |
-| `EMAIL_FROM_ADDRESS`   | Email address to send from (must be verified in Brevo) | `noreply@yourdomain.com`                             |
+| `BETTER_AUTH_URL`      | Base URL of your application (production)              | `https://yourdomain.com`                                      |
+| `BETTER_AUTH_SECRET`   | Secret key for BetterAuth (generate securely)          | `base64-encoded-random-string`                                |
+| `NEXT_PUBLIC_APP_URL`  | Public URL of your application                         | `https://yourdomain.com`                                      |
+| `GOOGLE_CLIENT_ID`     | Google OAuth Client ID                                 | `123456789-abc.apps.googleusercontent.com`                    |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth Client Secret                             | `GOCSPX-xxxxxxxxxxxxx`                                        |
+| `GITHUB_CLIENT_ID`     | GitHub OAuth Client ID                                 | `Iv1.xxxxxxxxxxxxx`                                           |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth Client Secret                             | `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`                            |
+| `BREVO_API_KEY`        | Brevo API key for sending emails                       | `xkeysib-xxxxxxxxxxxxx`                                       |
+| `EMAIL_FROM_NAME`      | Name displayed in email sender                         | `My App`                                                      |
+| `EMAIL_FROM_ADDRESS`   | Email address to send from (must be verified in Brevo) | `noreply@yourdomain.com`                                      |
 
 ![important]
 
@@ -247,8 +247,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 
 ```bash
 DATABASE_URL="postgresql://user:pass@ep-random-123456.us-east-2.aws.neon.tech/neondb"
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-generated-secret"
+BETTER_AUTH_URL="http://localhost:3000"
+BETTER_AUTH_SECRET="your-generated-secret"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
@@ -263,10 +263,10 @@ EMAIL_FROM_ADDRESS="noreply@yourdomain.com"
 
 When deploying to production (Vercel, Netlify, etc.), set these environment variables in your platform's dashboard:
 
-- Use your production domain for `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL`
+- Use your production domain for `BETTER_AUTH_URL` and `NEXT_PUBLIC_APP_URL`
 - Ensure PostgreSQL network access allows your production server's IP
 - Update OAuth redirect URIs to use your production domain
-- Use a strong, randomly generated `NEXTAUTH_SECRET`
+- Use a strong, randomly generated `BETTER_AUTH_SECRET`
 
 ## Project Structure
 
@@ -283,7 +283,7 @@ nextjs-auth-postgres-template/
 │   │   ├── auth/              # Authentication components
 │   │   └── ui/                # shadcn/ui components
 │   ├── lib/                   # Utility functions and configurations
-│   │   ├── auth/              # NextAuth configuration
+│   │   ├── auth/              # BetterAuth configuration
 │   │   ├── constants/         # Application constants
 │   │   ├── email/             # Email service (Brevo)
 │   │   └── validations/       # Zod validation schemas
@@ -309,12 +309,12 @@ nextjs-auth-postgres-template/
 2. **Email Verification**: Email/password users receive a verification email
 3. **Login**: Users can log in with email/password (after verification) or OAuth
 4. **Password Reset**: Users can request a password reset via email
-5. **Session Management**: Sessions are managed via NextAuth.js with JWT strategy
+5. **Session Management**: Sessions are managed via BetterAuth.js with JWT strategy
 
 ## Security Considerations
 
 - ⚠️ **PostgreSQL Network Access**: For production, restrict PostgreSQL access to specific IP addresses if possible
-- 🔐 **NEXTAUTH_SECRET**: Always use a strong, randomly generated secret
+- 🔐 **BETTER_AUTH_SECRET**: Always use a strong, randomly generated secret
 - 🔒 **Environment Variables**: Never commit `.env.local` to version control
 - ✅ **Email Verification**: Email verification is required before users can log in with email/password
 - 🛡️ **Password Hashing**: Passwords are hashed using bcryptjs before storage

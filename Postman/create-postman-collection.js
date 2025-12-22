@@ -33,8 +33,8 @@ const OUTPUT_ENVIRONMENT_FILENAME = path.join(
 // API structure for Auth
 const apiRoutes = [
   {
-    name: 'NextAuth Core',
-    description: 'Standard NextAuth.js endpoints',
+    name: 'BetterAuth Core',
+    description: 'Standard BetterAuth.js endpoints',
     endpoints: [
       {
         name: 'Get CSRF Token',
@@ -231,12 +231,12 @@ const authInstructions = {
   request: {
     method: 'GET', // No actual request, just information
     url: { raw: '' }, // Empty URL
-    description: `# NextAuth.js Authentication in Postman
+    description: `# BetterAuth.js Authentication in Postman
 
-NextAuth.js uses **cookie-based authentication**. To test endpoints that require login in Postman:
+BetterAuth.js uses **cookie-based authentication**. To test endpoints that require login in Postman:
 
 1.  **Get CSRF Token:** Run \`GET /api/auth/csrf\` first. This automatically sets \`csrfToken\` in your environment (via the Test script).
-2.  **Sign In:** Run \`POST /api/auth/signin/credentials\` with your test user credentials (from the environment). If successful, NextAuth.js will return session cookies that Postman **automatically saves and sends** in future requests to the same domain (\`{{baseUrl}}\`).
+2.  **Sign In:** Run \`POST /api/auth/signin/credentials\` with your test user credentials (from the environment). If successful, BetterAuth.js will return session cookies that Postman **automatically saves and sends** in future requests to the same domain (\`{{baseUrl}}\`).
 3.  **Verify Session:** Run \`GET /api/auth/session\` to see if you are logged in and view session data.
 4.  **Test protected endpoints:** Now you can call other API endpoints that require login. Postman automatically sends the cookie.
 5.  **Sign Out:** Run \`POST /api/auth/signout\` (with a valid \`csrfToken\`) to remove the cookie.

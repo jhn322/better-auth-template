@@ -1,9 +1,5 @@
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
-import {
-  AUTH_MESSAGES,
-  DEFAULT_LOGIN_REDIRECT,
-} from '@/lib/auth/constants/auth';
+import { authClient } from '@/lib/auth/auth-client';
 
 interface UseGithubAuthProps {
   onSuccess?: () => void;
@@ -19,24 +15,15 @@ export const useGithubAuth = ({
   const handleGithubSignIn = async () => {
     setLoading(true);
     try {
-      const result = await signIn('github', {
-        callbackUrl: DEFAULT_LOGIN_REDIRECT,
-        redirect: false,
+      await authClient.signIn.social({
+        provider: 'github',
+        callbackURL: window.location.origin + '/',
       });
-
-      if (result?.error) {
-        onError?.(
-          new Error(result.error || AUTH_MESSAGES.ERROR_GITHUB_SIGNIN_FAILED)
-        );
-      } else if (result?.ok) {
-        onSuccess?.();
-      }
+      onSuccess?.();
     } catch (error) {
-      onError?.(
-        error instanceof Error
-          ? error
-          : new Error(AUTH_MESSAGES.ERROR_GITHUB_SIGNIN_FAILED)
-      );
+      const err =
+        error instanceof Error ? error : new Error('GitHub sign in failed');
+      onError?.(err);
     } finally {
       setLoading(false);
     }

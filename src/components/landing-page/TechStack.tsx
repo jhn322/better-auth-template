@@ -9,7 +9,7 @@ const techs = [
   { name: 'TypeScript', desc: 'Type-safe development' },
   { name: 'PostgreSQL', desc: 'Robust relational database' },
   { name: 'Prisma ORM', desc: 'Type-safe database access' },
-  { name: 'NextAuth.js', desc: 'Authentication for Next.js' },
+  { name: 'BetterAuth.js', desc: 'Authentication for Next.js' },
   { name: 'Brevo Email', desc: 'Transactional email service' },
   { name: 'Tailwind CSS', desc: 'Utility-first styling' },
 ];

@@ -18,7 +18,7 @@ const integrations = [
   },
   {
     icon: Lock,
-    title: 'NextAuth.js',
+    title: 'BetterAuth.js',
     description:
       'Industry-standard authentication with OAuth providers and secure sessions',
   },

@@ -22,7 +22,7 @@ const faqs = [
   {
     question: 'What about OAuth providers other than Google and GitHub?',
     answer:
-      'The template uses NextAuth.js which supports 50+ OAuth providers. Adding additional providers like Microsoft, Apple, or Auth0 is as simple as adding a few lines of code.',
+      'The template uses BetterAuth.js which supports 50+ OAuth providers. Adding additional providers like Microsoft, Apple, or Auth0 is as simple as adding a few lines of code.',
   },
   {
     question: 'How do I customize the email templates?',

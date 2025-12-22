@@ -20,6 +20,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { forgotPasswordSchema } from '@/lib/auth/validation/forgot-password';
 import { AUTH_PATHS } from '@/lib/constants/routes';
+import { authClient } from '@/lib/auth/auth-client';
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
@@ -27,9 +28,6 @@ export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isSuccess, setIsSuccess] = React.useState<boolean>(false);
   const [pageError, setPageError] = React.useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(
-    null
-  );
   const [isOAuthAccount, setIsOAuthAccount] = React.useState<boolean>(false);
 
   const form = useForm<ForgotPasswordFormData>({
@@ -43,43 +41,33 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
     setIsSuccess(false);
     setPageError(null);
-    setSuccessMessage(null);
     setIsOAuthAccount(false);
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+      const { error: resetError } = await authClient.requestPasswordReset({
+        email: data.email,
+        redirectTo: '/auth/reset-password',
       });
 
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        const message =
-          responseData.message || 'Failed to send password reset email.';
-        setPageError(message);
-        if (response.status !== 429) {
-          toast.error(message);
+      if (resetError) {
+        if (resetError.code === 'USER_IS_LINKED_TO_SOCIAL_ACCOUNT') {
+          setIsOAuthAccount(true);
+          setIsSuccess(true);
+          toast.info('This account uses social sign-in.');
+          return;
         }
-        return;
+        throw new Error(
+          resetError.message || 'Failed to send password reset email.'
+        );
       }
 
-      setSuccessMessage(responseData.message);
-      setIsOAuthAccount(responseData.isOAuthAccount || false);
       setIsSuccess(true);
-      if (!responseData.isOAuthAccount) {
-        toast.success('Password reset link sent. Please check your inbox.');
-      } else {
-        toast.info('Please see the information message for more information.');
-      }
+      toast.success('Password reset link sent. Please check your inbox.');
     } catch (error) {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : 'An unexpected network error occurred.';
+          : 'An unexpected error occurred.';
       setPageError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -131,10 +119,9 @@ export default function ForgotPasswordPage() {
                   {isOAuthAccount ? 'Information' : 'Reset Link Sent'}
                 </h2>
                 <p className="text-muted-foreground">
-                  {successMessage ||
-                    (isOAuthAccount
-                      ? 'This account uses Google Sign-In. No password reset is needed.'
-                      : 'Check your email for the reset link!')}
+                  {isOAuthAccount
+                    ? 'This account uses Google or GitHub Sign-In. No password reset is needed.'
+                    : 'Check your email for the reset link!'}
                 </p>
                 <Button asChild variant="outline" className="w-full">
                   <Link href={AUTH_PATHS.LOGIN}>Back to Login</Link>

@@ -13,28 +13,22 @@ import { useAuthForm } from '@/lib/auth/hooks/useAuthForm';
 import type { AuthFormData } from '@/components/auth/AuthForm/types';
 import { useGoogleAuth } from '@/lib/auth/hooks/useGoogleAuth';
 import { useGithubAuth } from '@/lib/auth/hooks/useGithubAuth';
-import { useRedirect } from '@/lib/auth/hooks/useRedirect';
 import { DEFAULT_LOGIN_REDIRECT } from '@/lib/auth/constants/auth';
-import { useAuth } from '@/context/auth-context';
+import { authClient } from '@/lib/auth/auth-client';
 import { Spinner } from '@/components/ui/spinner';
 import { APP_NAME } from '@/lib/constants/site';
 
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { redirectToCallback } = useRedirect();
-  const { status } = useAuth();
-  const authenticated = status === 'authenticated';
-  const authLoading = status === 'loading';
+  const { data: session, isPending: authLoading } = authClient.useSession();
+  const authenticated = !!session;
 
   useEffect(() => {
     if (searchParams.get('verified') === 'true') {
       toast.success('Email verified successfully! You can now log in.');
     }
-    // if (searchParams.get("unverified") === "true") {
-    //   toast.error("Please verify your email before accessing that page.");
-    // }
-  }, [searchParams, router]);
+  }, [searchParams]);
 
   const {
     loading: formLoading,
@@ -43,17 +37,17 @@ function LoginContent() {
     setError,
   } = useAuthForm({
     mode: 'login',
-    onSuccess: redirectToCallback,
+    onSuccess: () => router.push(DEFAULT_LOGIN_REDIRECT),
   });
 
   const { loading: googleLoading, handleGoogleSignIn } = useGoogleAuth({
-    onSuccess: redirectToCallback,
-    onError: (error) => setError(error.message),
+    onSuccess: () => router.push(DEFAULT_LOGIN_REDIRECT),
+    onError: (err: Error) => setError(err.message),
   });
 
   const { loading: githubLoading, handleGithubSignIn } = useGithubAuth({
-    onSuccess: redirectToCallback,
-    onError: (error) => setError(error.message),
+    onSuccess: () => router.push(DEFAULT_LOGIN_REDIRECT),
+    onError: (err: Error) => setError(err.message),
   });
 
   useEffect(() => {

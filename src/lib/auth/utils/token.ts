@@ -29,7 +29,7 @@ export async function createVerificationToken(
 
   // Delete any existing tokens for this user
   try {
-    const deleteResult = await prisma.verificationToken.deleteMany({
+    const deleteResult = await prisma.verification.deleteMany({
       where: {
         identifier: email,
       },
@@ -42,19 +42,19 @@ export async function createVerificationToken(
 
   // Create a new token
   try {
-    await prisma.verificationToken.create({
+    await prisma.verification.create({
       data: {
         identifier: email,
-        token,
-        expires,
+        value: token,
+        expiresAt: expires,
       },
     });
 
     // Double check that the token was created correctly
-    const createdToken = await prisma.verificationToken.findFirst({
+    const createdToken = await prisma.verification.findFirst({
       where: {
         identifier: email,
-        token,
+        value: token,
       },
     });
 
@@ -81,22 +81,22 @@ export async function validateVerificationToken(
   email?: string
 ): Promise<boolean> {
   const whereClause = {
-    token,
+    value: token,
     ...(email ? { identifier: email } : {}),
-    expires: {
+    expiresAt: {
       gt: new Date(),
     },
   };
 
-  const tokenRecord = await prisma.verificationToken.findFirst({
+  const tokenRecord = await prisma.verification.findFirst({
     where: whereClause,
   });
 
   if (!tokenRecord) {
     // if no token is found, return a generic message to avoid email enumeration
-    const expiredToken = await prisma.verificationToken.findFirst({
+    const expiredToken = await prisma.verification.findFirst({
       where: {
-        token,
+        value: token,
         ...(email ? { identifier: email } : {}),
       },
     });
@@ -202,16 +202,16 @@ export const generateAndSaveVerificationToken = async (
   try {
     // * 2. Delete any existing verification tokens for this email
     // This ensures only the latest verification link is valid for this purpose.
-    await prisma.verificationToken.deleteMany({
+    await prisma.verification.deleteMany({
       where: { identifier: email },
     });
 
     // * 3. Save the new verification token
-    await prisma.verificationToken.create({
+    await prisma.verification.create({
       data: {
         identifier: email,
-        token: token, // Store the raw token
-        expires,
+        value: token, // Store the raw token
+        expiresAt: expires,
       },
     });
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/options';
+import { auth } from '@/lib/auth/auth';
+import { headers } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
@@ -8,7 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -27,12 +29,11 @@ export async function POST(req: Request) {
     // Create unique filename
     const filename = `${uuidv4()}${path.extname(file.name)}`;
     const uploadDir = path.join(process.cwd(), 'public/uploads');
-    
+
     // Ensure directory exists
     try {
       await mkdir(uploadDir, { recursive: true });
-    } catch {
-    }
+    } catch {}
 
     const filepath = path.join(uploadDir, filename);
     await writeFile(filepath, buffer);

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/options';
+import { auth } from '@/lib/auth/auth';
+import { headers } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -10,7 +10,9 @@ const profileSchema = z.object({
 
 export async function PATCH(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -51,7 +53,9 @@ export async function PATCH(req: Request) {
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -59,11 +63,10 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      select: {
-        name: true,
-        email: true,
-        image: true,
-        password: true,
+      include: {
+        accounts: {
+          where: { providerId: 'email' },
+        },
       },
     });
 
@@ -71,12 +74,15 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    // Check if user has an email account (password)
+    const hasPassword = user.accounts.length > 0;
+
     return NextResponse.json({
       user: {
         name: user.name,
         email: user.email,
         image: user.image,
-        hasPassword: !!user.password,
+        hasPassword,
       },
     });
   } catch (error) {

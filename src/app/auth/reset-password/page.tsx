@@ -21,6 +21,7 @@ import {
 import { PasswordInput } from '@/components/ui/password-input';
 import { resetPasswordSchema } from '@/lib/auth/validation/reset-password';
 import { Spinner } from '@/components/ui/spinner';
+import { authClient } from '@/lib/auth/auth-client';
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
@@ -57,18 +58,13 @@ function ResetPasswordFormContent() {
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ...data, token }),
+      const { error: resetError } = await authClient.resetPassword({
+        newPassword: data.password,
+        token: token,
       });
 
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || 'Failed to reset password.');
+      if (resetError) {
+        throw new Error(resetError.message || 'Failed to reset password.');
       }
 
       setIsSuccess(true);
