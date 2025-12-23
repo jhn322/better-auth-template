@@ -6,12 +6,16 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { GoogleButton } from '@/components/auth/GoogleButton';
 import { GithubButton } from '@/components/auth/GithubButton';
+import { DiscordButton } from '@/components/auth/DiscordButton';
+import { TwitterButton } from '@/components/auth/TwitterButton';
 import { AuthDivider } from '@/components/auth/AuthDivider';
 import { AuthForm } from '@/components/auth/AuthForm';
 import type { AuthFormData } from '@/components/auth/AuthForm/types';
 import { useAuthForm } from '@/lib/auth/hooks/useAuthForm';
 import { useGoogleAuth } from '@/lib/auth/hooks/useGoogleAuth';
 import { useGithubAuth } from '@/lib/auth/hooks/useGithubAuth';
+import { useDiscordAuth } from '@/lib/auth/hooks/useDiscordAuth';
+import { useTwitterAuth } from '@/lib/auth/hooks/useTwitterAuth';
 import { Spinner } from '@/components/ui/spinner';
 import { DEFAULT_LOGIN_REDIRECT } from '@/lib/auth/constants/auth';
 import { authClient } from '@/lib/auth/auth-client';
@@ -42,6 +46,16 @@ function RegisterContent() {
     onError: (err: Error) => setError(err.message),
   });
 
+  const { loading: discordLoading, handleDiscordSignIn } = useDiscordAuth({
+    onSuccess: () => router.push(DEFAULT_LOGIN_REDIRECT),
+    onError: (err: Error) => setError(err.message),
+  });
+
+  const { loading: twitterLoading, handleTwitterSignIn } = useTwitterAuth({
+    onSuccess: () => router.push(DEFAULT_LOGIN_REDIRECT),
+    onError: (err: Error) => setError(err.message),
+  });
+
   useEffect(() => {
     if (!authLoading && authenticated) {
       router.push(DEFAULT_LOGIN_REDIRECT);
@@ -49,7 +63,12 @@ function RegisterContent() {
   }, [authenticated, authLoading, router]);
 
   const isLoading =
-    formLoading || googleLoading || githubLoading || authLoading;
+    formLoading ||
+    googleLoading ||
+    githubLoading ||
+    discordLoading ||
+    twitterLoading ||
+    authLoading;
 
   if (authLoading || (!authLoading && authenticated)) {
     return (
@@ -108,7 +127,7 @@ function RegisterContent() {
           </div>
 
           <div className="mt-10 space-y-6">
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               <GoogleButton
                 mode="register"
                 onSuccess={handleGoogleSignIn}
@@ -117,6 +136,16 @@ function RegisterContent() {
               <GithubButton
                 mode="register"
                 onSuccess={handleGithubSignIn}
+                isLoading={isLoading}
+              />
+              <DiscordButton
+                mode="register"
+                onSuccess={handleDiscordSignIn}
+                isLoading={isLoading}
+              />
+              <TwitterButton
+                mode="register"
+                onSuccess={handleTwitterSignIn}
                 isLoading={isLoading}
               />
             </div>

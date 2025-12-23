@@ -26,7 +26,7 @@ export const GithubButton = ({
       ) : (
         <>
           <GithubIcon />
-          {mode === 'login' ? 'Sign in with GitHub' : 'Sign up with GitHub'}
+          {mode === 'login' ? 'Github' : 'Github'}
         </>
       )}
     </Button>

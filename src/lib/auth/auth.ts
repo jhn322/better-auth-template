@@ -34,6 +34,16 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
       redirectURI: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback/github`,
     },
+    discord: {
+      clientId: process.env.DISCORD_CLIENT_ID!,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+      redirectURI: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback/discord`,
+    },
+    twitter: {
+      clientId: process.env.TWITTER_CLIENT_ID!,
+      clientSecret: process.env.TWITTER_CLIENT_SECRET!,
+      redirectURI: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback/twitter`,
+    },
   },
   trustedOrigins: [process.env.NEXT_PUBLIC_APP_URL!],
   advanced: {

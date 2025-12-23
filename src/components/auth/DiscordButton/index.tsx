@@ -1,15 +1,16 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { GoogleIcon } from './GoogleIcon';
-import type { GoogleButtonProps } from './types';
+import { DiscordIcon } from './DiscordIcon';
+import type { DiscordButtonProps } from './types';
 import { Loader2 } from 'lucide-react';
-export const GoogleButton = ({
+
+export const DiscordButton = ({
   mode,
   onSuccess,
   isLoading = false,
   disabled = false,
-}: GoogleButtonProps) => {
+}: DiscordButtonProps) => {
   return (
     <Button
       variant="outline"
@@ -24,8 +25,8 @@ export const GoogleButton = ({
         </>
       ) : (
         <>
-          <GoogleIcon />
-          {mode === 'login' ? 'Google' : 'Google'}
+          <DiscordIcon />
+          {mode === 'login' ? 'Discord' : 'Discord'}
         </>
       )}
     </Button>

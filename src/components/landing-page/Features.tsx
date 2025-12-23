@@ -20,7 +20,7 @@ const features = [
     icon: Cloud,
     title: 'Multi-Provider OAuth',
     description:
-      'Google and GitHub OAuth support out of the box for seamless authentication',
+      'Google, GitHub, Discord and Twitter OAuth support out of the box for seamless authentication',
   },
   {
     icon: Zap,

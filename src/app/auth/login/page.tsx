@@ -7,12 +7,16 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { GoogleButton } from '@/components/auth/GoogleButton';
 import { GithubButton } from '@/components/auth/GithubButton';
+import { DiscordButton } from '@/components/auth/DiscordButton';
+import { TwitterButton } from '@/components/auth/TwitterButton';
 import { AuthDivider } from '@/components/auth/AuthDivider';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { useAuthForm } from '@/lib/auth/hooks/useAuthForm';
 import type { AuthFormData } from '@/components/auth/AuthForm/types';
 import { useGoogleAuth } from '@/lib/auth/hooks/useGoogleAuth';
 import { useGithubAuth } from '@/lib/auth/hooks/useGithubAuth';
+import { useDiscordAuth } from '@/lib/auth/hooks/useDiscordAuth';
+import { useTwitterAuth } from '@/lib/auth/hooks/useTwitterAuth';
 import { DEFAULT_LOGIN_REDIRECT } from '@/lib/auth/constants/auth';
 import { authClient } from '@/lib/auth/auth-client';
 import { Spinner } from '@/components/ui/spinner';
@@ -50,6 +54,16 @@ function LoginContent() {
     onError: (err: Error) => setError(err.message),
   });
 
+  const { loading: discordLoading, handleDiscordSignIn } = useDiscordAuth({
+    onSuccess: () => router.push(DEFAULT_LOGIN_REDIRECT),
+    onError: (err: Error) => setError(err.message),
+  });
+
+  const { loading: twitterLoading, handleTwitterSignIn } = useTwitterAuth({
+    onSuccess: () => router.push(DEFAULT_LOGIN_REDIRECT),
+    onError: (err: Error) => setError(err.message),
+  });
+
   useEffect(() => {
     if (!authLoading && authenticated) {
       router.push(DEFAULT_LOGIN_REDIRECT);
@@ -57,7 +71,12 @@ function LoginContent() {
   }, [authenticated, authLoading, router]);
 
   const isAnyLoading =
-    formLoading || googleLoading || githubLoading || authLoading;
+    formLoading ||
+    googleLoading ||
+    githubLoading ||
+    discordLoading ||
+    twitterLoading ||
+    authLoading;
 
   if (authLoading || (!authLoading && authenticated)) {
     return (
@@ -105,7 +124,7 @@ function LoginContent() {
           </div>
 
           <div className="mt-10 space-y-6">
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               <GoogleButton
                 mode="login"
                 onSuccess={handleGoogleSignIn}
@@ -116,6 +135,18 @@ function LoginContent() {
                 mode="login"
                 onSuccess={handleGithubSignIn}
                 isLoading={githubLoading}
+                disabled={isAnyLoading}
+              />
+              <DiscordButton
+                mode="login"
+                onSuccess={handleDiscordSignIn}
+                isLoading={discordLoading}
+                disabled={isAnyLoading}
+              />
+              <TwitterButton
+                mode="login"
+                onSuccess={handleTwitterSignIn}
+                isLoading={twitterLoading}
                 disabled={isAnyLoading}
               />
             </div>
