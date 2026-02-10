@@ -1,6 +1,3 @@
-// * ==========================================================================
-// *                             ROUTE CONSTANTS
-// * ==========================================================================
 // Helps ensure consistency and ease of updates for all route paths in the application.
 
 // ** Site-wide Public Paths ** //
@@ -18,8 +15,8 @@ export const AUTH_PATHS = {
   FORGOT_PASSWORD: '/auth/forgot-password',
   RESET_PASSWORD: '/auth/reset-password',
   VERIFY_EMAIL_INFO_PAGE: '/auth/verify-email',
-  AUTH_ERROR: '/auth/error', // Placeholder, page not yet created
-  UNAUTHORIZED: '/auth/unauthorized', // Placeholder, page not yet created
+  AUTH_ERROR: '/auth/error', // Placeholder
+  UNAUTHORIZED: '/auth/unauthorized', // Placeholder
 } as const;
 
 // ** Protected Area Paths (require login) ** //
@@ -45,9 +42,6 @@ export const DEFAULT_LOGIN_REDIRECT_PATH: string =
 export const DEFAULT_LOGOUT_REDIRECT_PATH: string = SITE_PATHS.HOME;
 
 // ** Public Route Patterns ** //
-// An array of all paths/patterns considered public.
-// Useful for middleware or client-side routing logic.
-// Note: API routes are typically handled separately by middleware logic (e.g., checking if path starts with /api/auth)
 export const PUBLIC_ROUTE_PATTERNS: string[] = [
   SITE_PATHS.HOME,
   SITE_PATHS.ABOUT,
@@ -57,20 +51,18 @@ export const PUBLIC_ROUTE_PATTERNS: string[] = [
   AUTH_PATHS.REGISTER,
   AUTH_PATHS.FORGOT_PASSWORD,
   AUTH_PATHS.RESET_PASSWORD,
-  AUTH_PATHS.VERIFY_EMAIL_INFO_PAGE, // This is '/auth/verify-needed'
+  AUTH_PATHS.VERIFY_EMAIL_INFO_PAGE,
   AUTH_PATHS.AUTH_ERROR,
 ];
 
 // ** API Route Prefixes ** //
 export const API_ROUTE_PREFIX = '/api';
-export const API_AUTH_ROUTE_PREFIX = '/api/auth'; // Default BetterAuth prefix
+export const API_AUTH_ROUTE_PREFIX = '/api/auth';
 
 // ** Special Route Identifiers (if needed by middleware or logic) ** //
 export const ROOT_PATH = '/';
 
 // Paths that should use a minimal layout (e.g., no Navbar/Footer)
-
-// Includes auth paths and public signup paths
 
 export const ISOLATED_LAYOUT_PATHS = [
   ...Object.values(AUTH_PATHS),

@@ -1,12 +1,12 @@
-import { USER_ROLES, UserRole } from "@/lib/auth/constants/auth";
+import { USER_ROLES, UserRole } from '@/lib/auth/constants/auth';
 
 /**
  * Converts a user role to a readable text
  */
 export const formatRole = (role: UserRole): string => {
   const roleMap: Record<UserRole, string> = {
-    [USER_ROLES.USER]: "Student",
-    [USER_ROLES.ADMIN]: "Administrator",
+    [USER_ROLES.USER]: 'User',
+    [USER_ROLES.ADMIN]: 'Administrator',
   };
   return roleMap[role] || role;
 };
@@ -43,7 +43,7 @@ export const getEnvVar = (key: string): string => {
   if (!value) {
     // In production, we want to use a logger instead of console.error
     console.error(`Environment variable ${key} is not defined!`);
-    return "";
+    return '';
   }
   return value;
 };

@@ -1,6 +1,4 @@
-// import { Resend } from "resend";
 import { getEnvVar } from '@/lib/utils/env';
-// import { API_AUTH_PATHS } from '@/lib/constants/routes';
 import { APP_NAME } from '@/lib/constants/site';
 
 /**
@@ -191,12 +189,12 @@ export const sendVerificationEmail = async (email: string, url: string) => {
 
     // * 4. Handle API Response
     if (!response.ok) {
-      const errorBodyText = await response.text(); // Get raw text first
+      const errorBodyText = await response.text();
       let errorBody = {};
       try {
-        errorBody = JSON.parse(errorBodyText); // Try to parse as JSON
+        errorBody = JSON.parse(errorBodyText);
       } catch {
-        errorBody = { rawMessage: errorBodyText }; // Fallback to raw text
+        errorBody = { rawMessage: errorBodyText };
       }
       console.error(
         'Brevo HTTP API Error:',
@@ -212,7 +210,7 @@ export const sendVerificationEmail = async (email: string, url: string) => {
     const responseData = await response.json();
     console.log(
       `Verification email dispatched successfully via Brevo HTTP API to ${email}:`,
-      responseData // Contains messageId etc.
+      responseData
     );
   } catch (error) {
     console.error(

@@ -11,7 +11,6 @@ export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
 
   // BetterAuth session cookie check
-  // Note: BetterAuth uses "better-auth.session_token" by default
   const sessionCookie =
     request.cookies.get('better-auth.session_token') ||
     request.cookies.get('__Secure-better-auth.session_token');
