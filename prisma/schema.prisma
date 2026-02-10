@@ -33,7 +33,7 @@ model User {
   sessions      Session[]
 }
 
-// ** BetterAuth required models (mapped from BetterAuth) ** //
+// ** BetterAuth required models ** //
 model Account {
   id                    String    @id @default(cuid())
   userId                String

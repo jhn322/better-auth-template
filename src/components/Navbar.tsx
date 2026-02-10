@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { authClient } from '@/lib/auth/auth-client';
 import { OnlineStatusIndicator } from '@/components/ui/online-status-indicator';
+import { formatRole } from '@/lib/auth/utils/auth';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
   ChevronDown,
   HelpCircle,
@@ -56,8 +58,9 @@ export function Navbar() {
   // Check if user is authenticated
   const isAuthenticated = !!session;
   // Get user's role if authenticated
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userRole = (session?.user as any)?.role;
+  type UserRole = 'USER' | 'ADMIN';
+  const userRole: UserRole =
+    (session?.user as { role?: UserRole })?.role ?? 'USER';
 
   // Build up nav list with only public links
   const navItems = [...publicNavItems];
@@ -178,6 +181,16 @@ export function Navbar() {
                             >
                               {session?.user?.email}
                             </p>
+                            {userRole === 'ADMIN' && (
+                              <div className="mt-1">
+                                <Badge
+                                  variant="outline"
+                                  className="border-blue-500/60 bg-blue-500/10 text-blue-500"
+                                >
+                                  {formatRole(userRole)}
+                                </Badge>
+                              </div>
+                            )}
                           </div>
                         </div>
                         <OnlineStatusIndicator className="ml-2 h-2.5 w-2.5" />
@@ -285,6 +298,16 @@ export function Navbar() {
                             >
                               {session?.user?.email}
                             </p>
+                            {userRole === 'ADMIN' && (
+                              <div className="mt-1">
+                                <Badge
+                                  variant="outline"
+                                  className="border-blue-500/60 bg-blue-500/10 text-blue-500"
+                                >
+                                  {formatRole(userRole)}
+                                </Badge>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </DropdownMenuLabel>
