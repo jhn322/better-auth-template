@@ -25,6 +25,7 @@ import {
   User,
   LayoutDashboard,
   BookOpen,
+  Github,
 } from 'lucide-react';
 import { AUTH_PATHS, PROTECTED_PATHS } from '@/lib/constants/routes';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -71,7 +72,7 @@ export function Navbar() {
   // Close menu when screen becomes larger
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
+      if (window.innerWidth >= 1024) {
         setIsOpen(false);
       }
     };
@@ -115,7 +116,7 @@ export function Navbar() {
             </div>
 
             {/* Desktop Navigation - Centered */}
-            <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 md:flex">
+            <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 lg:flex">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -130,129 +131,151 @@ export function Navbar() {
             </div>
 
             {/* Auth Buttons & User Dropdown */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               {status === 'loading' ? (
                 <div className="flex items-center gap-2 px-2 py-1">
                   <Skeleton className="h-5 w-5 rounded-full" />
                   <Skeleton className="h-4 w-24" />
                   <Skeleton className="h-5 w-5 rounded-full" />
                 </div>
-              ) : isAuthenticated ? (
-                <DropdownMenu onOpenChange={setIsDropdownOpen}>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="text-foreground hover:bg-accent hover:text-accent-foreground flex items-center gap-2 px-2 py-1 transition-colors"
-                    >
-                      <User />
-                      <span>
-                        {capitalizeFirstLetter(
-                          session?.user?.name || session?.user?.email
-                        )}
-                      </span>
-                      <ChevronDown
-                        className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
-                      />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex items-center justify-between">
-                        <div className="flex min-w-0 items-center gap-3">
-                          <Avatar className="h-9 w-9 shrink-0">
-                            <AvatarImage
-                              src={session?.user?.image || undefined}
-                              alt={session?.user?.name || 'User'}
-                            />
-                            <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
-                              {session?.user?.email?.charAt(0).toUpperCase() ||
-                                'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex min-w-0 flex-1 flex-col space-y-1">
-                            <p className="truncate text-sm leading-none font-medium">
-                              {capitalizeFirstLetter(session?.user?.name) ||
-                                'User name'}
-                            </p>
-                            <p
-                              className="text-foreground/90 truncate text-xs leading-none"
-                              title={session?.user?.email || ''}
-                            >
-                              {session?.user?.email}
-                            </p>
-                            {userRole === 'ADMIN' && (
-                              <div className="mt-1">
-                                <Badge
-                                  variant="outline"
-                                  className="border-blue-500/60 bg-blue-500/10 text-blue-500"
-                                >
-                                  {formatRole(userRole)}
-                                </Badge>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <OnlineStatusIndicator className="ml-2 h-2.5 w-2.5" />
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-
-                    <Link href={PROTECTED_PATHS.DASHBOARD_BASE}>
-                      <DropdownMenuItem className="cursor-pointer">
-                        <LayoutDashboard className="mr-2 h-4 w-4" />
-                        <span>Dashboard</span>
-                      </DropdownMenuItem>
-                    </Link>
-
-                    <Link href={PROTECTED_PATHS.DOCUMENTATION_BASE}>
-                      <DropdownMenuItem className="cursor-pointer">
-                        <BookOpen className="mr-2 h-4 w-4" />
-                        <span>Documentation</span>
-                      </DropdownMenuItem>
-                    </Link>
-
-                    <Link href={PROTECTED_PATHS.SETTINGS_BASE}>
-                      <DropdownMenuItem className="cursor-pointer">
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Settings</span>
-                      </DropdownMenuItem>
-                    </Link>
-
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => {
-                        authClient.signOut({
-                          fetchOptions: {
-                            onSuccess: () => {
-                              window.location.href = '/';
-                            },
-                          },
-                        });
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Link href={AUTH_PATHS.LOGIN}>
+                  <Link
+                    href="https://github.com/jhn322/better-auth-template"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <Button
                       variant="default"
                       size="lg"
-                      className="border-foreground bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                      className="border-border bg-foreground text-background hover:bg-foreground/90 gap-2"
                     >
-                      Sign In
+                      <Github className="h-4 w-4" />
+                      <span>GitHub</span>
                     </Button>
                   </Link>
+
+                  {isAuthenticated ? (
+                    <DropdownMenu onOpenChange={setIsDropdownOpen}>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="text-foreground hover:bg-accent hover:text-accent-foreground flex items-center gap-2 px-2 py-1 transition-colors"
+                        >
+                          <User />
+                          <span>
+                            {capitalizeFirstLetter(
+                              session?.user?.name || session?.user?.email
+                            )}
+                          </span>
+                          <ChevronDown
+                            className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                          />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        className="w-56"
+                        align="end"
+                        forceMount
+                      >
+                        <DropdownMenuLabel className="font-normal">
+                          <div className="flex items-center justify-between">
+                            <div className="flex min-w-0 items-center gap-3">
+                              <Avatar className="h-9 w-9 shrink-0">
+                                <AvatarImage
+                                  src={session?.user?.image || undefined}
+                                  alt={session?.user?.name || 'User'}
+                                />
+                                <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
+                                  {session?.user?.email
+                                    ?.charAt(0)
+                                    .toUpperCase() || 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex min-w-0 flex-1 flex-col space-y-1">
+                                <p className="truncate text-sm leading-none font-medium">
+                                  {capitalizeFirstLetter(session?.user?.name) ||
+                                    'User name'}
+                                </p>
+                                <p
+                                  className="text-foreground/90 truncate text-xs leading-none"
+                                  title={session?.user?.email || ''}
+                                >
+                                  {session?.user?.email}
+                                </p>
+                                {userRole === 'ADMIN' && (
+                                  <div className="mt-1">
+                                    <Badge
+                                      variant="outline"
+                                      className="border-blue-500/60 bg-blue-500/10 text-blue-500"
+                                    >
+                                      {formatRole(userRole)}
+                                    </Badge>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <OnlineStatusIndicator className="ml-2 h-2.5 w-2.5" />
+                          </div>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+
+                        <Link href={PROTECTED_PATHS.DASHBOARD_BASE}>
+                          <DropdownMenuItem className="cursor-pointer">
+                            <LayoutDashboard className="mr-2 h-4 w-4" />
+                            <span>Dashboard</span>
+                          </DropdownMenuItem>
+                        </Link>
+
+                        <Link href={PROTECTED_PATHS.DOCUMENTATION_BASE}>
+                          <DropdownMenuItem className="cursor-pointer">
+                            <BookOpen className="mr-2 h-4 w-4" />
+                            <span>Documentation</span>
+                          </DropdownMenuItem>
+                        </Link>
+
+                        <Link href={PROTECTED_PATHS.SETTINGS_BASE}>
+                          <DropdownMenuItem className="cursor-pointer">
+                            <Settings className="mr-2 h-4 w-4" />
+                            <span>Settings</span>
+                          </DropdownMenuItem>
+                        </Link>
+
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => {
+                            authClient.signOut({
+                              fetchOptions: {
+                                onSuccess: () => {
+                                  window.location.href = '/';
+                                },
+                              },
+                            });
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <LogOut className="mr-2 h-4 w-4" />
+                          <span>Log out</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <Link href={AUTH_PATHS.LOGIN}>
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="border-foreground bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                      >
+                        Sign In
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               )}
             </div>
 
             {/* User Dropdown (if authenticated) */}
-            <div className="flex items-center gap-2 md:hidden">
+            <div className="flex items-center gap-2 lg:hidden">
               {/* Mobile User Dropdown */}
               {status === 'loading' ? (
                 <Skeleton className="h-10 w-10 rounded-md" />
@@ -370,7 +393,7 @@ export function Navbar() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative h-14 w-14 p-0 hover:bg-transparent md:hidden"
+                className="relative h-14 w-14 p-0 hover:bg-transparent lg:hidden"
                 onClick={handleToggleMenu}
                 aria-expanded={isOpen}
                 aria-label="Toggle menu"
@@ -404,7 +427,7 @@ export function Navbar() {
 
         {/* Mobile Menu Overlay */}
         <div
-          className={`bg-background fixed inset-0 z-40 transition-transform duration-500 ease-in-out md:hidden ${
+          className={`bg-background fixed inset-0 z-40 transition-transform duration-500 ease-in-out lg:hidden ${
             isOpen ? 'translate-y-16' : 'translate-y-[-100%]'
           }`}
         >
@@ -426,22 +449,37 @@ export function Navbar() {
               ))}
 
               <div className="mt-8 flex w-full flex-col gap-3">
+                <Link
+                  href="https://github.com/jhn322/better-auth-template"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block w-full"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="text-md border-border bg-foreground text-background hover:bg-foreground/90 w-full gap-2"
+                  >
+                    <Github className="h-4 w-4" />
+                    GitHub
+                  </Button>
+                </Link>
+
                 {status === 'unauthenticated' && (
-                  <>
-                    <Link
-                      href={AUTH_PATHS.LOGIN}
-                      className="block w-full"
-                      onClick={() => setIsOpen(false)}
+                  <Link
+                    href={AUTH_PATHS.LOGIN}
+                    className="block w-full"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Button
+                      variant="default"
+                      size="lg"
+                      className="border-foreground bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground text-md w-full transition-colors"
                     >
-                      <Button
-                        variant="default"
-                        size="lg"
-                        className="border-foreground bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground text-md w-full transition-colors"
-                      >
-                        Sign In
-                      </Button>
-                    </Link>
-                  </>
+                      Sign In
+                    </Button>
+                  </Link>
                 )}
               </div>
             </div>
