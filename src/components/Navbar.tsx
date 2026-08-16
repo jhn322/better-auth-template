@@ -140,21 +140,6 @@ export function Navbar() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Link
-                    href="https://github.com/jhn322/better-auth-template"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <Button
-                      variant="default"
-                      size="lg"
-                      className="border-border bg-foreground text-background hover:bg-foreground/90 gap-2"
-                    >
-                      <Github className="h-4 w-4" />
-                      <span>GitHub</span>
-                    </Button>
-                  </Link>
-
                   {isAuthenticated ? (
                     <DropdownMenu onOpenChange={setIsDropdownOpen}>
                       <DropdownMenuTrigger asChild>
@@ -260,15 +245,31 @@ export function Navbar() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   ) : (
-                    <Link href={AUTH_PATHS.LOGIN}>
-                      <Button
-                        variant="default"
-                        size="lg"
-                        className="border-foreground bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href="https://github.com/jhn322/better-auth-template"
+                        target="_blank"
+                        rel="noreferrer"
                       >
-                        Sign In
-                      </Button>
-                    </Link>
+                        <Button
+                          variant="default"
+                          size="lg"
+                          className="border-border bg-foreground text-background hover:bg-foreground/90 gap-2"
+                        >
+                          <Github className="h-4 w-4" />
+                          <span>Github</span>
+                        </Button>
+                      </Link>
+                      <Link href={AUTH_PATHS.LOGIN}>
+                        <Button
+                          variant="default"
+                          size="lg"
+                          className="border-foreground bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                        >
+                          Sign In
+                        </Button>
+                      </Link>
+                    </div>
                   )}
                 </div>
               )}
@@ -449,37 +450,38 @@ export function Navbar() {
               ))}
 
               <div className="mt-8 flex w-full flex-col gap-3">
-                <Link
-                  href="https://github.com/jhn322/better-auth-template"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block w-full"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="text-md border-border bg-foreground text-background hover:bg-foreground/90 w-full gap-2"
-                  >
-                    <Github className="h-4 w-4" />
-                    GitHub
-                  </Button>
-                </Link>
-
                 {status === 'unauthenticated' && (
-                  <Link
-                    href={AUTH_PATHS.LOGIN}
-                    className="block w-full"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Button
-                      variant="default"
-                      size="lg"
-                      className="border-foreground bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground text-md w-full transition-colors"
+                  <>
+                    <Link
+                      href="https://github.com/jhn322/better-auth-template"
+                      className="block w-full"
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() => setIsOpen(false)}
                     >
-                      Sign In
-                    </Button>
-                  </Link>
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="border-border bg-foreground text-background hover:bg-foreground/90 text-md w-full gap-2 transition-colors"
+                      >
+                        <Github className="h-4 w-4" />
+                        <span>Github</span>
+                      </Button>
+                    </Link>
+                    <Link
+                      href={AUTH_PATHS.LOGIN}
+                      className="block w-full"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="border-foreground bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground text-md w-full transition-colors"
+                      >
+                        Sign In
+                      </Button>
+                    </Link>
+                  </>
                 )}
               </div>
             </div>
